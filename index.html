@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>RA Daily Checklist with User Profiles</title>
+  <title>Bonie's RA Daily Checklist with User Profiles</title>
   <style>
     body {
       background: #f7f7f7;
@@ -132,7 +132,7 @@
   <!-- Login & Registration Container -->
   <div id="loginContainer" class="container">
     <div id="loginSection">
-      <h1>RA Checklist - Login</h1>
+      <h1>Mom's RA Checklist - Login</h1>
       <form id="loginForm">
         <label>
           Username:
@@ -168,12 +168,13 @@
 
   <!-- Main App Container (RA Checklist) -->
   <div id="appContainer" class="container">
+    <!-- Logout button is placed outside the form to ensure it always remains visible -->
     <button id="logoutBtn">Logout</button>
     <h1>RA Daily Checklist</h1>
     <form id="checklistForm">
       <label>
         Name:
-        <!-- This field can be prefilled with the logged-in username -->
+        <!-- This field is prefilled with the logged-in username -->
         <input type="text" id="userName" placeholder="Your name" required>
       </label>
       <label>
@@ -202,6 +203,14 @@
       <label>
         Dinner:
         <input type="text" id="dinner" placeholder="Enter food or 'nothing'">
+      </label>
+      <label>
+        Snacks:
+        <input type="text" id="snacks" placeholder="Enter snacks or 'nothing'">
+      </label>
+      <label>
+        Drinks:
+        <input type="text" id="drinks" placeholder="Enter drinks or 'nothing'">
       </label>
       <button type="submit">Save Entry</button>
     </form>
@@ -344,6 +353,7 @@
     // Save a new checklist entry.
     document.getElementById("checklistForm").addEventListener("submit", function(e) {
       e.preventDefault();
+      
       // Get form values.
       const userName = document.getElementById("userName").value;
       const entryDate = document.getElementById("entryDate").value;
@@ -352,6 +362,8 @@
       const breakfast = document.getElementById("breakfast").value || 'nothing';
       const lunch = document.getElementById("lunch").value || 'nothing';
       const dinner = document.getElementById("dinner").value || 'nothing';
+      const snacks = document.getElementById("snacks").value || 'nothing';
+      const drinks = document.getElementById("drinks").value || 'nothing';
 
       // Create an entry object.
       const entry = {
@@ -362,14 +374,18 @@
         steroids,
         breakfast,
         lunch,
-        dinner
+        dinner,
+        snacks,
+        drinks
       };
 
       // Save the entry.
       entries.push(entry);
       localStorage.setItem("raChecklistEntries_" + loggedInUser, JSON.stringify(entries));
       alert("Entry saved!");
+      
       updateHistory();
+      // Reset the form fields without affecting the logout button (since it's outside the form).
       document.getElementById("checklistForm").reset();
       // Refill the name field.
       document.getElementById("userName").value = loggedInUser;
@@ -382,9 +398,9 @@
         return;
       }
       let csvContent = "data:text/csv;charset=utf-8,";
-      csvContent += "Name,Date,Timestamp,Body Feeling,Steroids,Breakfast,Lunch,Dinner\n";
+      csvContent += "Name,Date,Timestamp,Body Feeling,Steroids,Breakfast,Lunch,Dinner,Snacks,Drinks\n";
       entries.forEach(function(entry) {
-        csvContent += `"${entry.name}","${entry.date}","${entry.timestamp}",${entry.bodyFeeling},${entry.steroids},"${entry.breakfast}","${entry.lunch}","${entry.dinner}"\n`;
+        csvContent += `"${entry.name}","${entry.date}","${entry.timestamp}",${entry.bodyFeeling},${entry.steroids},"${entry.breakfast}","${entry.lunch}","${entry.dinner}","${entry.snacks}","${entry.drinks}"\n`;
       });
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
