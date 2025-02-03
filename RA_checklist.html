@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RA Daily Checklist with User Profiles</title>
+  <style>
+    body {
+      background: #f7f7f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .container {
+      background: #fff;
+      padding: 2em;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      margin-bottom: 1em;
+    }
+    h1 {
+      margin-bottom: 0.5em;
+      color: #333;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      margin-top: 1em;
+      text-align: left;
+      color: #555;
+    }
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"] {
+      width: 100%;
+      padding: 0.5em;
+      margin-top: 0.25em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .radio-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      margin-top: 0.25em;
+    }
+    .radio-group label {
+      margin: 0;
+    }
+    button {
+      margin-top: 1.5em;
+      padding: 0.75em;
+      border: none;
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #exportBtn {
+      background-color: #28a745;
+    }
+    #exportBtn:hover {
+      background-color: #1e7e34;
+    }
+    #clearBtn {
+      background-color: #dc3545;
+    }
+    #clearBtn:hover {
+      background-color: #c82333;
+    }
+    #logoutBtn {
+      background-color: #6c757d;
+      float: right;
+      margin-top: 0;
+    }
+    #logoutBtn:hover {
+      background-color: #5a6268;
+    }
+    .button-group {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+    }
+    .button-group button {
+      flex: 1;
+      margin: 0.5em;
+    }
+    /* Table styles for history */
+    #history {
+      margin-top: 2em;
+      text-align: left;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    /* Hide elements by default */
+    #appContainer, #registerSection {
+      display: none;
+    }
+    a {
+      cursor: pointer;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <!-- Login & Registration Container -->
+  <div id="loginContainer" class="container">
+    <div id="loginSection">
+      <h1>RA Checklist - Login</h1>
+      <form id="loginForm">
+        <label>
+          Username:
+          <input type="text" id="loginUsername" placeholder="Enter your username" required>
+        </label>
+        <label>
+          Password:
+          <input type="password" id="loginPassword" placeholder="Enter your password" required>
+        </label>
+        <button type="submit">Login</button>
+      </form>
+      <p>Don't have an account? <a id="showRegisterLink">Register here</a></p>
+    </div>
+    <div id="registerSection">
+      <h1>Create an Account</h1>
+      <p>
+        Please fill in the fields below to create your account. Your username and password will be used to securely log in and access your personal RA Daily Checklist. Once registered, you'll be able to track your daily health data, view past entries, export your data as a CSV file, and more.
+      </p>
+      <form id="registerForm">
+        <label>
+          Username:
+          <input type="text" id="registerUsername" placeholder="Choose a username" required>
+        </label>
+        <label>
+          Password:
+          <input type="password" id="registerPassword" placeholder="Choose a password" required>
+        </label>
+        <button type="submit">Register</button>
+      </form>
+      <p>Already have an account? <a id="showLoginLink">Login here</a></p>
+    </div>
+  </div>
+
+  <!-- Main App Container (RA Checklist) -->
+  <div id="appContainer" class="container">
+    <button id="logoutBtn">Logout</button>
+    <h1>RA Daily Checklist</h1>
+    <form id="checklistForm">
+      <label>
+        Name:
+        <!-- This field can be prefilled with the logged-in username -->
+        <input type="text" id="userName" placeholder="Your name" required>
+      </label>
+      <label>
+        Date:
+        <input type="date" id="entryDate" required>
+      </label>
+      <label>
+        How is your body feeling today? (1-10):
+        <input type="number" id="bodyFeeling" min="1" max="10" required>
+      </label>
+      <label>
+        Did you take steroids today?
+        <div class="radio-group">
+          <label><input type="radio" name="steroids" value="yes" required> Yes</label>
+          <label><input type="radio" name="steroids" value="no"> No</label>
+        </div>
+      </label>
+      <label>
+        Breakfast:
+        <input type="text" id="breakfast" placeholder="Enter food or 'nothing'">
+      </label>
+      <label>
+        Lunch:
+        <input type="text" id="lunch" placeholder="Enter food or 'nothing'">
+      </label>
+      <label>
+        Dinner:
+        <input type="text" id="dinner" placeholder="Enter food or 'nothing'">
+      </label>
+      <button type="submit">Save Entry</button>
+    </form>
+
+    <div class="button-group">
+      <button id="exportBtn">Export Data as CSV</button>
+      <button id="clearBtn">Clear All Data</button>
+    </div>
+
+    <!-- Past entries table -->
+    <div id="history">
+      <h2>Past Entries</h2>
+      <table id="entriesTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Feeling</th>
+            <th>Steroids</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Past entries will be inserted here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    /* -----------------------------
+       User Registration & Login
+       ----------------------------- */
+    // Helper functions to manage users in localStorage.
+    function getUsers() {
+      return JSON.parse(localStorage.getItem("users") || "{}");
+    }
+    function setUsers(users) {
+      localStorage.setItem("users", JSON.stringify(users));
+    }
+
+    // Show/hide login and registration sections.
+    function showLogin() {
+      document.getElementById("loginSection").style.display = "block";
+      document.getElementById("registerSection").style.display = "none";
+    }
+    function showRegister() {
+      document.getElementById("loginSection").style.display = "none";
+      document.getElementById("registerSection").style.display = "block";
+    }
+
+    // Check if a user is logged in (using sessionStorage).
+    function checkLogin() {
+      const loggedInUser = sessionStorage.getItem("loggedInUser");
+      if (loggedInUser) {
+        document.getElementById("loginContainer").style.display = "none";
+        document.getElementById("appContainer").style.display = "block";
+        // Prefill the Name field with the logged-in username.
+        document.getElementById("userName").value = loggedInUser;
+        loadEntries();
+      } else {
+        document.getElementById("loginContainer").style.display = "block";
+        document.getElementById("appContainer").style.display = "none";
+      }
+    }
+
+    // Login form submission.
+    document.getElementById("loginForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value;
+      const users = getUsers();
+      if (users[username] && users[username].password === password) {
+        sessionStorage.setItem("loggedInUser", username);
+        checkLogin();
+      } else {
+        alert("Invalid username or password");
+      }
+    });
+
+    // Registration form submission.
+    document.getElementById("registerForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const username = document.getElementById("registerUsername").value.trim();
+      const password = document.getElementById("registerPassword").value;
+      const users = getUsers();
+      if (users[username]) {
+        alert("Username already exists");
+      } else {
+        users[username] = { username, password };
+        setUsers(users);
+        alert("Registration successful. Please log in.");
+        showLogin();
+      }
+    });
+
+    // Toggle between login and registration views.
+    document.getElementById("showRegisterLink").addEventListener("click", function(e) {
+      e.preventDefault();
+      showRegister();
+    });
+    document.getElementById("showLoginLink").addEventListener("click", function(e) {
+      e.preventDefault();
+      showLogin();
+    });
+
+    // Logout button clears the session.
+    document.getElementById("logoutBtn").addEventListener("click", function() {
+      sessionStorage.removeItem("loggedInUser");
+      location.reload();
+    });
+
+    /* -----------------------------
+       RA Checklist Functionality
+       ----------------------------- */
+    // We'll store each user's checklist entries under a key that includes the username.
+    let entries = [];
+    let loggedInUser = null;
+
+    function loadEntries() {
+      loggedInUser = sessionStorage.getItem("loggedInUser");
+      entries = JSON.parse(localStorage.getItem("raChecklistEntries_" + loggedInUser)) || [];
+      updateHistory();
+    }
+
+    function updateHistory() {
+      const entriesTableBody = document.querySelector("#entriesTable tbody");
+      entriesTableBody.innerHTML = "";
+      entries.forEach(function(entry) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${entry.name}</td>
+          <td>${entry.date}</td>
+          <td>${entry.bodyFeeling}</td>
+          <td>${entry.steroids}</td>
+        `;
+        entriesTableBody.appendChild(row);
+      });
+    }
+
+    // Save a new checklist entry.
+    document.getElementById("checklistForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      // Get form values.
+      const userName = document.getElementById("userName").value;
+      const entryDate = document.getElementById("entryDate").value;
+      const bodyFeeling = document.getElementById("bodyFeeling").value;
+      const steroids = document.querySelector('input[name="steroids"]:checked').value;
+      const breakfast = document.getElementById("breakfast").value || 'nothing';
+      const lunch = document.getElementById("lunch").value || 'nothing';
+      const dinner = document.getElementById("dinner").value || 'nothing';
+
+      // Create an entry object.
+      const entry = {
+        name: userName,
+        date: entryDate,
+        timestamp: new Date().toISOString(),
+        bodyFeeling,
+        steroids,
+        breakfast,
+        lunch,
+        dinner
+      };
+
+      // Save the entry.
+      entries.push(entry);
+      localStorage.setItem("raChecklistEntries_" + loggedInUser, JSON.stringify(entries));
+      alert("Entry saved!");
+      updateHistory();
+      document.getElementById("checklistForm").reset();
+      // Refill the name field.
+      document.getElementById("userName").value = loggedInUser;
+    });
+
+    // Export data as CSV.
+    document.getElementById("exportBtn").addEventListener("click", function() {
+      if (entries.length === 0) {
+        alert("No data to export.");
+        return;
+      }
+      let csvContent = "data:text/csv;charset=utf-8,";
+      csvContent += "Name,Date,Timestamp,Body Feeling,Steroids,Breakfast,Lunch,Dinner\n";
+      entries.forEach(function(entry) {
+        csvContent += `"${entry.name}","${entry.date}","${entry.timestamp}",${entry.bodyFeeling},${entry.steroids},"${entry.breakfast}","${entry.lunch}","${entry.dinner}"\n`;
+      });
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "RA_checklist_data.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    // Clear all checklist data.
+    document.getElementById("clearBtn").addEventListener("click", function() {
+      if (confirm("Are you sure you want to clear all data? This action cannot be undone.")) {
+        localStorage.removeItem("raChecklistEntries_" + loggedInUser);
+        entries = [];
+        updateHistory();
+        alert("All data cleared.");
+      }
+    });
+
+    // On page load, check if a user is logged in.
+    checkLogin();
+  </script>
+</body>
+</html>
